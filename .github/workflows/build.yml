@@ -1,0 +1,58 @@
+name: Build APK
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: دریافت کد
+        uses: actions/checkout@v4
+
+      - name: نصب JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: نصب و کش Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: بررسی وجود فایل‌های فونت
+        # اگر فونت‌ها را طبق README اضافه نکرده باشی، Build اینجا با پیام روشن متوقف می‌شود
+        # به‌جای شکست مبهم بعدی در مرحله resource merge.
+        run: |
+          FONT_DIR="app/src/main/res/font"
+          missing=0
+          for f in vazirmatn_regular vazirmatn_medium vazirmatn_bold \
+                   estedad_regular estedad_medium estedad_bold \
+                   sahel_regular sahel_bold \
+                   shabnam_regular shabnam_bold \
+                   samim_regular samim_bold \
+                   lalezar_regular; do
+            if [ ! -f "$FONT_DIR/$f.ttf" ]; then
+              echo "::warning::فایل فونت پیدا نشد: $FONT_DIR/$f.ttf"
+              missing=1
+            fi
+          done
+          if [ "$missing" = "1" ]; then
+            echo "::error::یک یا چند فایل فونت گم است. طبق README.md آن‌ها را دانلود و اضافه کن."
+            exit 1
+          fi
+
+      - name: Build نسخه Debug
+        run: gradle assembleDebug --stacktrace
+
+      - name: آپلود APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: yadar-debug-apk
+          path: app/build/outputs/apk/debug/*.apk

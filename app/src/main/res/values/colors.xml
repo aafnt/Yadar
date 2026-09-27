@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- پالت خنثی و آرام؛ Accent توسط کاربر در تنظیمات قابل تغییر است -->
+    <color name="yadar_accent_default">#4A7C7C</color>
+    <color name="yadar_background_light">#FAFAF8</color>
+    <color name="yadar_surface_light">#FFFFFF</color>
+    <color name="yadar_on_surface_light">#1C1C1A</color>
+    <color name="yadar_background_dark">#121212</color>
+    <color name="yadar_surface_dark">#1E1E1E</color>
+    <color name="yadar_on_surface_dark">#EDEDEA</color>
+    <color name="yadar_outline">#C9C9C4</color>
+
+    <!-- رنگ‌های پیشنهادی سریع برای Color Picker متن Widget -->
+    <color name="picker_white">#FFFFFF</color>
+    <color name="picker_black">#000000</color>
+    <color name="picker_gray">#9E9E9E</color>
+    <color name="picker_gold">#D4AF37</color>
+    <color name="picker_blue">#4A7CB5</color>
+    <color name="picker_green">#5E8C61</color>
+    <color name="picker_red">#B5544A</color>
