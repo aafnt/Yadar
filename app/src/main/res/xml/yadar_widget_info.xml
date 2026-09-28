@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    بدون updatePeriodMillis دوره‌ای (بند ۲۶ و ۲۷ سند پروژه: از Timer/Polling
+    دائمی خودداری شود). Refresh فقط با لمس کاربر، تغییر داده در برنامه، یا
+    Alarmهای دقیق و کم‌تعداد AlarmRefreshScheduler انجام می‌شود.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="110dp"
+    android:minHeight="40dp"
+    android:targetCellWidth="2"
+    android:targetCellHeight="1"
+    android:maxResizeWidth="300dp"
+    android:maxResizeHeight="200dp"
+    android:resizeMode="horizontal|vertical"
+    android:updatePeriodMillis="0"
+    android:configure="com.yadar.app.widget.WidgetConfigActivity"
+    android:widgetCategory="home_screen"
+    android:previewLayout="@layout/widget_preview_placeholder" />
