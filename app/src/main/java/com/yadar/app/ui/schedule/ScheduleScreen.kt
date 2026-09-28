@@ -16,6 +16,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import android.appwidget.AppWidgetManager
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
+import com.yadar.app.widget.WidgetConfigActivity
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,6 +30,7 @@ import com.yadar.app.util.PersianDigits
 @Composable
 fun ScheduleScreen(viewModel: ScheduleViewModel) {
     val widgets by viewModel.widgets.collectAsState()
+    val context = LocalContext.current
 
     if (widgets.isEmpty()) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -48,6 +53,11 @@ fun ScheduleScreen(viewModel: ScheduleViewModel) {
                     Text("مجموعه: ${item.collectionName}", style = MaterialTheme.typography.bodyMedium)
                     Text("فونت: ${item.config.font.name}", style = MaterialTheme.typography.bodyMedium)
                     Text("روش انتخاب: ${item.config.selectionMode.name}", style = MaterialTheme.typography.bodyMedium)
+                    TextButton(onClick = {
+                        val intent = Intent(context, WidgetConfigActivity::class.java)
+                            .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, item.config.widgetId)
+                        context.startActivity(intent)
+                    }) { Text("ویرایش ظاهر و تنظیمات Widget") }
                     TextButton(onClick = { viewModel.resetHistory(item.config.widgetId) }) {
                         Text(stringResource(R.string.settings_reset_manual_order))
                     }

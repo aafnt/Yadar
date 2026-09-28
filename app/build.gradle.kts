@@ -19,6 +19,18 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // کلید امضای Debug ثابت و داخل ریپو نگه‌داری می‌شود. بدون آن، هر بار GitHub Actions یک
+    // کلید تصادفی جدید می‌سازد و اندروید نسخه جدید را روی نسخه قبلی نصب نمی‌کند (امضا متفاوت است).
+    // فقط برای Debug است و مخفی نیست؛ برای انتشار عمومی از کلید Release جداگانه استفاده کن.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true

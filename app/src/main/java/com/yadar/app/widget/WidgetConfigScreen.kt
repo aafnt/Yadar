@@ -64,7 +64,7 @@ private val fontSizePresets = listOf(12, 14, 16, 18, 20, 24, 28, 32, 36, 40)
 private val fontWeightPresets = listOf(100, 200, 300, 400, 500, 600, 700, 800, 900)
 
 @Composable
-fun WidgetConfigScreen(viewModel: WidgetConfigViewModel, onSave: () -> Unit) {
+fun WidgetConfigScreen(viewModel: WidgetConfigViewModel, onSave: suspend () -> Unit) {
     val config by viewModel.config.collectAsState()
     val collections by viewModel.collections.collectAsState()
     val showWallpaper by viewModel.showWallpaperPreview.collectAsState()

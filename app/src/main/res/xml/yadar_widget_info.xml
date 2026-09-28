@@ -15,4 +15,5 @@
     android:updatePeriodMillis="0"
     android:configure="com.yadar.app.widget.WidgetConfigActivity"
     android:widgetCategory="home_screen"
+    android:widgetFeatures="reconfigurable"
     android:previewLayout="@layout/widget_preview_placeholder" />
