@@ -72,7 +72,10 @@ class YadarWidget : GlanceAppWidget() {
     companion object {
         /** برای فراخوانی از UseCase/Updater بدون وابستگی مستقیم UI به این کلاس. */
         suspend fun updateAll(context: Context) {
-            YadarWidget().updateAll(context)
+            val manager = GlanceAppWidgetManager(context)
+            val glanceIds = manager.getGlanceIds(YadarWidget::class.java)
+            val widget = YadarWidget()
+            glanceIds.forEach { glanceId -> widget.update(context, glanceId) }
         }
 
         suspend fun updateOne(context: Context, appWidgetId: Int) {

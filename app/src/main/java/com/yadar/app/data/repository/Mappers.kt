@@ -2,7 +2,7 @@ package com.yadar.app.data.repository
 
 import com.yadar.app.data.local.entity.CollectionEntity
 import com.yadar.app.data.local.entity.DisplayRuleEntity
-import com.yadar.app.data.local.entity.DisplayRuleType
+import com.yadar.app.domain.model.DisplayRuleType
 import com.yadar.app.data.local.entity.SentenceEntity
 import com.yadar.app.data.local.entity.WidgetConfigEntity
 import com.yadar.app.domain.model.Collection

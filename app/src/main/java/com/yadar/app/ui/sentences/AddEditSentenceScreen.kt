@@ -1,3 +1,5 @@
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+
 package com.yadar.app.ui.sentences
 
 import androidx.compose.foundation.layout.Arrangement
@@ -6,7 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.verticalScroll
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -29,7 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.yadar.app.R
-import com.yadar.app.data.local.entity.DisplayRuleType
+import com.yadar.app.domain.model.DisplayRuleType
 import com.yadar.app.domain.usecase.SENTENCE_MAX_LENGTH
 import com.yadar.app.util.PersianDate
 import com.yadar.app.util.PersianDigits

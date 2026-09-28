@@ -10,6 +10,23 @@ data class Collection(
     val createdAt: Long = System.currentTimeMillis()
 )
 
+/**
+ * برچسبی که کاربر هنگام افزودن جمله انتخاب می‌کند (بند ۹ سند پروژه).
+ * فقط تعیین می‌کند کدام فیلدهای ورودی (روز هفته/ساعت/تاریخ) در فرم نمایش
+ * داده شوند؛ واجد شرایط بودن واقعی همیشه بر اساس مقادیر واقعی [DisplayRule]
+ * محاسبه می‌شود (بند ۵۸، تصمیم فنی مستندشده).
+ */
+enum class DisplayRuleType {
+    DAILY,
+    ON_CHANGE,
+    SEQUENTIAL,
+    RANDOM,
+    BY_WEEKDAY,
+    BY_TIME,
+    BY_DATE,
+    COMBINED
+}
+
 /** null یعنی «بدون محدودیت» برای هر فیلد؛ چند فیلد هم‌زمان یعنی حالت ترکیبی (AND). */
 data class DisplayRule(
     val type: DisplayRuleType = DisplayRuleType.ON_CHANGE,

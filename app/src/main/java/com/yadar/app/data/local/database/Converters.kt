@@ -1,7 +1,7 @@
 package com.yadar.app.data.local.database
 
 import androidx.room.TypeConverter
-import com.yadar.app.data.local.entity.DisplayRuleType
+import com.yadar.app.domain.model.DisplayRuleType
 import com.yadar.app.domain.model.FontChoice
 import com.yadar.app.domain.model.SelectionMode
 import com.yadar.app.domain.model.WidgetBackgroundMode

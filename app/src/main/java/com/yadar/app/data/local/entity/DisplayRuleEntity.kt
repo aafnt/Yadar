@@ -4,29 +4,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-
-/**
- * برچسبی که کاربر هنگام افزودن جمله انتخاب می‌کند (بند ۹ سند پروژه).
- * این فیلد فقط تعیین می‌کند کدام بخش‌های ورودی (روز هفته/ساعت/تاریخ) در فرم
- * افزودن جمله نمایش داده شوند؛ منطق واقعی واجد شرایط بودن همیشه بر اساس
- * مقادیر واقعی [DisplayRuleEntity] (نه این برچسب) محاسبه می‌شود، چون همه‌ی
- * این فیلدها می‌توانند هم‌زمان مقدار داشته باشند (حالت «ترکیبی»).
- *
- * تصمیم فنی مستندشده (بند ۵۸): «روش انتخاب» واقعی (Sequential/Random/...)
- * که در بند ۱۲ تعریف شده، یک تنظیم سطح Widget است (چون باید بین چند جمله
- * انتخاب کند)، نه سطح تک‌جمله؛ در [com.yadar.app.data.local.entity.WidgetConfigEntity]
- * نگه‌داری می‌شود. این برچسب فقط برای UI فرم افزودن جمله است.
- */
-enum class DisplayRuleType {
-    DAILY,
-    ON_CHANGE,
-    SEQUENTIAL,
-    RANDOM,
-    BY_WEEKDAY,
-    BY_TIME,
-    BY_DATE,
-    COMBINED
-}
+import com.yadar.app.domain.model.DisplayRuleType
 
 /**
  * قوانین زمانی یک جمله (بند ۱۳ سند پروژه). رابطه یک‌به‌یک با [SentenceEntity].
@@ -42,6 +20,9 @@ enum class DisplayRuleType {
  * - [startDateEpochDay] / [endDateEpochDay]: بر اساس [java.time.LocalDate.toEpochDay]
  *   ذخیره می‌شوند، نه رشته یا timestamp با Time Zone، تا تغییر منطقه زمانی هرگز
  *   باعث جابه‌جایی روز نشود (بند ۱۳).
+ *
+ * [DisplayRuleType] در domain.model تعریف شده (نه اینجا) چون یک مفهوم دامنه‌ای
+ * است که ViewModelها و UseCaseها هم مستقیماً از آن استفاده می‌کنند.
  */
 @Entity(
     tableName = "display_rules",

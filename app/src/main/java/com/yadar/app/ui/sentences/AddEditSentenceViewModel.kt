@@ -2,7 +2,7 @@ package com.yadar.app.ui.sentences
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yadar.app.data.local.entity.DisplayRuleType
+import com.yadar.app.domain.model.DisplayRuleType
 import com.yadar.app.domain.model.Collection
 import com.yadar.app.domain.model.DisplayRule
 import com.yadar.app.domain.model.Sentence

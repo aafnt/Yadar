@@ -25,7 +25,7 @@ import com.yadar.app.data.local.entity.WidgetConfigEntity
         SelectionHistoryEntity::class
     ],
     version = 1,
-    exportSchema = true
+    exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class YadarDatabase : RoomDatabase() {
