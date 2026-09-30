@@ -22,7 +22,7 @@ enum class SelectionMode {
 }
 
 enum class FontChoice {
-    VAZIRMATN, ESTEDAD, SAHEL, SHABNAM, SAMIM, LALEZAR
+    VAZIRMATN, ESTEDAD, SAHEL, SHABNAM, SAMIM, LALEZAR, PERSIAN_SOLS
 }
 
 enum class WidgetTextAlignment { RIGHT, CENTER, LEFT }

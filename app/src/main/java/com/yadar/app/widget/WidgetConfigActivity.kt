@@ -20,9 +20,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.yadar.app.YadarApplication
+import com.yadar.app.domain.model.AppSettings
 import com.yadar.app.ui.theme.YadarTheme
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 
 class WidgetConfigActivity : ComponentActivity() {
 
@@ -46,13 +45,13 @@ class WidgetConfigActivity : ComponentActivity() {
 
         val container = (application as YadarApplication).container
 
-        // مقدار تم را قبل از ساخت UI همگام می‌خوانیم تا صفحه حتی لحظه‌ای با تم سیستم نمایش داده نشود.
-        val initialSettings = runBlocking { container.settingsRepository.settings.first() }
-
         setContent {
-            // تم و رنگ Accent را از تنظیمات ذخیره‌شده برنامه می‌خوانیم (نه از سیستم گوشی)
+            // تم و رنگ Accent را از تنظیمات ذخیره‌شده برنامه می‌خوانیم (نه از سیستم گوشی).
+            // مقدار initial فقط تا رسیدن اولین مقدار واقعی از DataStore استفاده می‌شود
+            // (معمولاً در همان فریم اول)؛ عمداً از runBlocking روی Main Thread برای
+            // خواندن از دیسک استفاده نشده است.
             val settings by container.settingsRepository.settings
-                .collectAsState(initial = initialSettings)
+                .collectAsState(initial = AppSettings())
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
                 YadarTheme(
                     themeMode = settings.themeMode,
@@ -74,6 +73,9 @@ class WidgetConfigActivity : ComponentActivity() {
                         onSave = {
                             // باید پیش از finish() و داخل همین Coroutine اجرا شود؛ در غیر این صورت با بسته‌شدن
                             // Activity لغو می‌شود و Widget بعد از تغییر تنظیمات بازسازی نمی‌شود.
+                            // انتخاب جمله را دوباره صریح اجرا می‌کنیم (نه فقط updateOne) چون کاربر ممکن
+                            // است مجموعه یا روش انتخاب را عوض کرده باشد؛ جمله فعلی قبلی دیگر معتبر نیست.
+                            container.refreshWidgetSentenceUseCase(appWidgetId)
                             YadarWidget.updateOne(this@WidgetConfigActivity, appWidgetId)
                             AlarmRefreshScheduler(this@WidgetConfigActivity).scheduleNext()
                             val resultValue = Intent().putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)

@@ -21,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -48,14 +47,11 @@ fun SentencesScreen(
     val query by viewModel.searchQuery.collectAsState()
     val sortOrder by viewModel.sortOrder.collectAsState()
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = onAddSentence) {
-                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.sentences_add))
-            }
-        }
-    ) { padding ->
-        Column(modifier = Modifier.padding(padding).fillMaxSize()) {
+    // به‌جای Scaffold تودرتو (که Padding را دوبار حساب می‌کرد و بالای Navigation Bar
+    // فضای خالی اضافه می‌ساخت)، از یک Box ساده با FAB دستی استفاده می‌شود؛ Padding واقعی
+    // ناوبری پایین از همان Scaffold بیرونی در MainActivity تأمین می‌شود.
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(16.dp, 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -96,6 +92,12 @@ fun SentencesScreen(
                     }
                 }
             }
+        }
+        FloatingActionButton(
+            onClick = onAddSentence,
+            modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp)
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.sentences_add))
         }
     }
 }

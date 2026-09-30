@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.LocalSize
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -58,9 +59,21 @@ class YadarWidget : GlanceAppWidget() {
         val container = app.container
 
         val config = container.widgetConfigRepository.getById(appWidgetId)
-        val sentence = if (config != null) {
-            container.refreshWidgetSentenceUseCase(appWidgetId, LocalDateTime.now())
-        } else null
+
+        // نکته مهم (رفع باگ «لمس فقط یک‌بار کار می‌کند»): اینجا هرگز دوباره
+        // Selection Engine را برای انتخاب جمله تازه صدا نمی‌زنیم. آن منطق فقط در
+        // لحظاتی که واقعاً باید انتخاب عوض شود اجرا می‌شود: لمس کاربر
+        // (WidgetTouchHandler)، ذخیره تنظیمات Widget (WidgetConfigActivity)، رسیدن
+        // به مرز زمانی یا نیمه‌شب (WidgetRefreshAlarmReceiver)، یا باز شدن قفل صفحه
+        // (ScreenUnlockReceiver). اگر اینجا هم دوباره انتخاب می‌کردیم، همان Render
+        // که بلافاصله بعد از هر لمس اتفاق می‌افتد، انتخاب لمس را فوری بازنویسی
+        // می‌کرد و به نظر می‌رسید لمس فقط دفعه اول اثر دارد (بند ۲۳/۲۴ سند پروژه:
+        // Render مجدد نباید بدون دلیل جمله را عوض کند).
+        var sentence = config?.currentSentenceId?.let { container.sentenceRepository.getById(it) }
+        if (config != null && (sentence == null || !sentence.isActive)) {
+            // اولین بار بعد از ساخت Widget، یا جمله‌ی قبلی حذف/غیرفعال شده: یک انتخاب اولیه لازم است.
+            sentence = container.refreshWidgetSentenceUseCase(appWidgetId, LocalDateTime.now())
+        }
 
         provideContent {
             GlanceTheme {
@@ -128,8 +141,27 @@ private fun WidgetContent(config: WidgetConfig?, sentence: Sentence?) {
         WidgetTextAlignment.LEFT -> TextAlign.Left
     }
 
+    // بند «بالا و پایین جمله خیلی خالی است»: وقتی کاربر Widget را بزرگ‌تر از یک
+    // خط کوچک می‌گذارد، فونت را متناسب با ارتفاع واقعی Widget کمی بزرگ‌تر
+    // می‌کنیم تا فضای خالی کمتر به چشم بیاید. این هرگز از اندازه انتخابی کاربر
+    // کوچک‌تر نمی‌شود، فقط در Widgetهای بزرگ‌تر آن را افزایش می‌دهد؛ برای
+    // جمله‌های طولانی‌تر کمتر بزرگ می‌شود تا از Widget بیرون نزند.
+    val availableHeightDp = LocalSize.current.height.value
+    val referenceHeightDp = 64f
+    val textLength = sentence?.text?.length ?: 0
+    val maxScaleForLength = when {
+        textLength > 160 -> 1f
+        textLength > 80 -> 1.25f
+        else -> 1.6f
+    }
+    val heightScale = (availableHeightDp / referenceHeightDp).coerceIn(1f, maxScaleForLength)
+    val effectiveFontSizeSp = config.fontSizeSp * heightScale
+
+    val meaningText = sentence?.meaning?.takeIf { it.isNotBlank() }
+    val showMeaning = config.showMeaning && meaningText != null
+
     Box(
-        modifier = backgroundModifier.then(touchModifier).padding(12.dp),
+        modifier = backgroundModifier.then(touchModifier).padding(horizontal = 12.dp, vertical = 6.dp),
         contentAlignment = alignment
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -140,13 +172,28 @@ private fun WidgetContent(config: WidgetConfig?, sentence: Sentence?) {
                     color = ColorProvider(
                         ComposeColor(config.fontColorArgb).copy(alpha = config.opacityPercent / 100f)
                     ),
-                    fontSize = config.fontSizeSp.sp,
+                    fontSize = effectiveFontSizeSp.sp,
                     fontWeight = if (config.fontWeight >= 700) FontWeight.Bold else FontWeight.Normal,
                     fontStyle = FontStyle.Normal,
                     fontFamily = fontFamilyForWidget(config.font),
                     textAlign = textAlign
                 )
             )
+            // معنی/ترجمه، فقط اگر روشن باشد و جمله فعلی معنی داشته باشد؛ وگرنه فقط خود جمله.
+            if (showMeaning) {
+                Text(
+                    text = meaningText.orEmpty(),
+                    maxLines = config.maxLines,
+                    style = TextStyle(
+                        color = ColorProvider(
+                            ComposeColor(config.fontColorArgb).copy(alpha = (config.opacityPercent * 0.85f) / 100f)
+                        ),
+                        fontSize = (config.meaningFontSizeSp * heightScale).sp,
+                        fontFamily = fontFamilyForWidget(config.meaningFont),
+                        textAlign = textAlign
+                    )
+                )
+            }
             if (config.showDate && config.dateDisplay != WidgetDateDisplay.OFF) {
                 val today = LocalDate.now()
                 val dateText = if (config.dateDisplay == WidgetDateDisplay.SHORT_WITH_WEEKDAY) {
@@ -179,6 +226,7 @@ private fun fontFamilyForWidget(choice: FontChoice): FontFamily = when (choice) 
     FontChoice.SHABNAM -> FontFamily("shabnam")
     FontChoice.SAMIM -> FontFamily("samim")
     FontChoice.LALEZAR -> FontFamily("lalezar")
+    FontChoice.PERSIAN_SOLS -> FontFamily("persian_sols")
 }
 
 class NextSentenceActionCallback : ActionCallback {

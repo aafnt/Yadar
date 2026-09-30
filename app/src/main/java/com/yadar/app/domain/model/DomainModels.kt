@@ -50,7 +50,9 @@ data class Sentence(
     val updatedAt: Long = System.currentTimeMillis(),
     val manualSortOrder: Long = 0,
     val lastShownAt: Long? = null,
-    val displayRule: DisplayRule = DisplayRule.NONE
+    val displayRule: DisplayRule = DisplayRule.NONE,
+    /** معنی/ترجمه اختیاری؛ اگر خالی باشد فقط خود جمله در Widget نشان داده می‌شود. */
+    val meaning: String? = null
 )
 
 data class WidgetConfig(
@@ -70,6 +72,9 @@ data class WidgetConfig(
     val backgroundAlphaPercent: Int = 40,
     val showDate: Boolean = false,
     val dateDisplay: WidgetDateDisplay = WidgetDateDisplay.OFF,
+    val showMeaning: Boolean = true,
+    val meaningFont: FontChoice = FontChoice.VAZIRMATN,
+    val meaningFontSizeSp: Int = 14,
     val touchAction: WidgetTouchAction = WidgetTouchAction.NEXT_SENTENCE,
     val currentSentenceId: Long? = null,
     val lastSelectionEpochDay: Long? = null,

@@ -10,15 +10,20 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 
-class WidgetRefreshAlarmReceiver : BroadcastReceiver() {
+/**
+ * با هر بار باز شدن قفل صفحه (کاربر واقعاً وارد گوشی می‌شود)، Selection Engine
+ * برای همه Widgetها دوباره اجرا می‌شود. برای هر Widget طبق روش انتخاب خودش
+ * رفتار می‌کند: در «با هر تغییر» و «تصادفی» همیشه یک جمله تازه انتخاب می‌شود؛
+ * در «روزانه» تا وقتی روز عوض نشده همان جمله می‌ماند؛ در «ترتیبی» یک قدم جلو
+ * می‌رود؛ در «تصادفی بدون تکرار» طبق تاریخچه پیش می‌رود.
+ */
+class ScreenUnlockReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != Intent.ACTION_USER_PRESENT) return
         val pendingResult = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                // از وقتی provideGlance فقط انتخاب از‌قبل‌ذخیره‌شده را نمایش می‌دهد (نه اینکه
-                // خودش دوباره انتخاب کند)، این Alarm باید صریحاً Selection Engine را برای هر
-                // Widget اجرا کند؛ وگرنه رسیدن به مرز زمانی/نیمه‌شب هیچ اثری نداشت (بند ۲۵).
                 val container = (context.applicationContext as YadarApplication).container
                 val now = LocalDateTime.now()
                 val currentWidgets = container.widgetConfigRepository.observeAll().first()
@@ -26,7 +31,6 @@ class WidgetRefreshAlarmReceiver : BroadcastReceiver() {
                     container.refreshWidgetSentenceUseCase(config.widgetId, now)
                 }
                 YadarWidget.updateAll(context)
-                AlarmRefreshScheduler(context).scheduleNext()
             } finally {
                 pendingResult.finish()
             }

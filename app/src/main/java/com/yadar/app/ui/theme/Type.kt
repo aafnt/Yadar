@@ -34,6 +34,7 @@ val SamimFontFamily = FontFamily(
     Font(R.font.samim_bold, FontWeight.Bold)
 )
 val LalezarFontFamily = FontFamily(Font(R.font.lalezar_regular, FontWeight.Normal))
+val PersianSolsFontFamily = FontFamily(Font(R.font.persian_sols_regular, FontWeight.Normal))
 
 /** فونت مناسب هر [FontChoice] برای استفاده در Preview داخل برنامه و در Widget واقعی (Glance). */
 fun fontFamilyFor(choice: FontChoice): FontFamily = when (choice) {
@@ -43,6 +44,7 @@ fun fontFamilyFor(choice: FontChoice): FontFamily = when (choice) {
     FontChoice.SHABNAM -> ShabnamFontFamily
     FontChoice.SAMIM -> SamimFontFamily
     FontChoice.LALEZAR -> LalezarFontFamily
+    FontChoice.PERSIAN_SOLS -> PersianSolsFontFamily
 }
 
 /** UI اصلی برنامه همیشه با Vazirmatn نمایش داده می‌شود؛ انتخاب فونت فقط برای Widget است. */

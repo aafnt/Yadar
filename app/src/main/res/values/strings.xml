@@ -41,6 +41,7 @@
     <string name="sentences_text_too_long">متن جمله طولانی‌تر از حد مجاز است و ممکن است در Widget به‌درستی نمایش داده نشود.</string>
     <string name="sentences_choose_collection">انتخاب مجموعه</string>
     <string name="sentences_choose_display_rule">روش نمایش</string>
+    <string name="sentences_meaning_hint">معنی / ترجمه (اختیاری)</string>
 
     <!-- روش‌های نمایش -->
     <string name="display_mode_daily">روزانه</string>
@@ -74,11 +75,11 @@
     <string name="schedule_start_date">تاریخ شروع</string>
     <string name="schedule_end_date">تاریخ پایان</string>
     <string name="weekday_saturday">شنبه</string>
-    <string name="weekday_sunday">یکشنبه</string>
-    <string name="weekday_monday">دوشنبه</string>
-    <string name="weekday_tuesday">سه‌شنبه</string>
-    <string name="weekday_wednesday">چهارشنبه</string>
-    <string name="weekday_thursday">پنجشنبه</string>
+    <string name="weekday_sunday">۱شنبه</string>
+    <string name="weekday_monday">۲شنبه</string>
+    <string name="weekday_tuesday">۳شنبه</string>
+    <string name="weekday_wednesday">۴شنبه</string>
+    <string name="weekday_thursday">۵شنبه</string>
     <string name="weekday_friday">جمعه</string>
 
     <!-- تنظیمات -->
@@ -115,6 +116,9 @@
     <string name="widget_config_bg_solid">رنگ ثابت</string>
     <string name="widget_config_bg_custom_alpha">شفافیت سفارشی</string>
     <string name="widget_config_show_date">نمایش تاریخ</string>
+    <string name="widget_config_show_meaning">نمایش معنی زیر جمله</string>
+    <string name="widget_config_meaning_font">فونت معنی</string>
+    <string name="widget_config_meaning_font_size">اندازه فونت معنی</string>
     <string name="widget_config_touch_action">عملکرد لمس</string>
     <string name="widget_touch_next">جمله بعدی</string>
     <string name="widget_touch_random">جمله تصادفی</string>

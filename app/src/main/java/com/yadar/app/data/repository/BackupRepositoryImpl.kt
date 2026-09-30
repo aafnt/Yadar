@@ -54,6 +54,7 @@ class BackupRepositoryImpl(
                 JSONObject().apply {
                     put("id", s.id)
                     put("text", s.text)
+                    put("meaning", s.meaning ?: JSONObject.NULL)
                     put("collectionId", s.collectionId ?: JSONObject.NULL)
                     put("isActive", s.isActive)
                     put("createdAt", s.createdAt)
@@ -136,11 +137,13 @@ class BackupRepositoryImpl(
                 val oldCollectionId = if (obj.isNull("collectionId")) null else obj.getLong("collectionId")
                 val newCollectionId = oldCollectionId?.let { collectionIdMap[it] }
                 val text = obj.getString("text")
+                val meaning = if (obj.has("meaning") && !obj.isNull("meaning")) obj.getString("meaning") else null
 
                 val newSentenceId = sentenceDao.insert(
                     SentenceEntity(
                         text = text,
                         normalizedText = TextNormalizer.forSearch(text),
+                        meaning = meaning,
                         collectionId = newCollectionId,
                         isActive = obj.optBoolean("isActive", true),
                         createdAt = obj.optLong("createdAt", System.currentTimeMillis()),

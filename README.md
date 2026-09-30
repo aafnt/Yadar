@@ -64,6 +64,12 @@ util/        PersianDigits، PersianDate، TextNormalizer
 | Samim | `samim_regular.ttf`, `samim_bold.ttf` | SIL OFL 1.1 | github.com/rastikerdar/samim-font |
 | Lalezar | `lalezar_regular.ttf` | SIL OFL 1.1 | github.com/rastikerdar/lalezar-font |
 
+**فونت هفتم، «Persian Sols»**، فایلش را خودت داده‌ای و از قبل داخل
+`res/font/persian_sols_regular.ttf` قرار دارد — نیازی به دانلود جداگانه ندارد.
+فقط یک وزن (Regular) دارد و برای خط‌های تزئینی/کوتاه مناسب است، نه متن طولانی.
+پیش از هر انتشار عمومی (نه فقط تست شخصی)، مجوز توزیع این فونت خاص را با
+سازنده‌اش بررسی کن؛ منشأ و مجوز آن مثل ۶ فونت بالا مستند نیست.
+
 فایل مجوز (LICENSE) هر فونت را هم کنار فایل‌های آن (یا در پوشه `fonts_licenses/`
 در ریشه پروژه) نگه دار، طبق بند ۴۹ سند پروژه.
 

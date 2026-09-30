@@ -49,6 +49,11 @@ data class WidgetConfigEntity(
     val showDate: Boolean = false,
     val dateDisplay: WidgetDateDisplay = WidgetDateDisplay.OFF,
 
+    /** نمایش معنی زیر جمله، با فونت/اندازه جدا (فقط وقتی جمله معنی داشته باشد نمایش داده می‌شود). */
+    val showMeaning: Boolean = true,
+    val meaningFont: FontChoice = FontChoice.VAZIRMATN,
+    val meaningFontSizeSp: Int = 14,
+
     val touchAction: WidgetTouchAction = WidgetTouchAction.NEXT_SENTENCE,
 
     val currentSentenceId: Long? = null,

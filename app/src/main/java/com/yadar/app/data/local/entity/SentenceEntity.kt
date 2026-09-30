@@ -29,6 +29,8 @@ data class SentenceEntity(
     val id: Long = 0,
     val text: String,
     val normalizedText: String,
+    /** معنی/ترجمه اختیاری (مثلاً برای آیه‌های قرآن) - بند درخواست کاربر. */
+    val meaning: String? = null,
     val collectionId: Long? = null,
     val isActive: Boolean = true,
     val createdAt: Long,

@@ -22,6 +22,7 @@ import java.time.DayOfWeek
 data class AddEditSentenceUiState(
     val isEditing: Boolean = false,
     val text: String = "",
+    val meaning: String = "",
     val collectionId: Long? = null,
     val ruleType: DisplayRuleType = DisplayRuleType.ON_CHANGE,
     val weekdays: Set<DayOfWeek> = emptySet(),
@@ -57,6 +58,7 @@ class AddEditSentenceViewModel(
                 _uiState.update {
                     it.copy(
                         text = existing.text,
+                        meaning = existing.meaning ?: "",
                         collectionId = existing.collectionId,
                         ruleType = existing.displayRule.type,
                         weekdays = existing.displayRule.weekdays ?: emptySet(),
@@ -71,6 +73,7 @@ class AddEditSentenceViewModel(
     }
 
     fun setText(text: String) = _uiState.update { it.copy(text = text, validationError = null) }
+    fun setMeaning(meaning: String) = _uiState.update { it.copy(meaning = meaning) }
     fun setCollection(id: Long?) = _uiState.update { it.copy(collectionId = id) }
     fun setRuleType(type: DisplayRuleType) = _uiState.update { it.copy(ruleType = type) }
     fun toggleWeekday(day: DayOfWeek) = _uiState.update {
@@ -93,6 +96,7 @@ class AddEditSentenceViewModel(
         )
         val sentence = (originalSentence ?: Sentence(text = "")).copy(
             text = state.text,
+            meaning = state.meaning.trim().ifEmpty { null },
             collectionId = state.collectionId,
             displayRule = rule
         )

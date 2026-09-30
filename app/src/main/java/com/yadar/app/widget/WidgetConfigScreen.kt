@@ -149,6 +149,28 @@ fun WidgetConfigScreen(viewModel: WidgetConfigViewModel, onSave: suspend () -> U
                 }
             }
 
+            SectionLabel(R.string.widget_config_show_meaning)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Switch(
+                    checked = config.showMeaning,
+                    onCheckedChange = { checked -> viewModel.update { it.copy(showMeaning = checked) } }
+                )
+                Text(
+                    "اگر جمله معنی نداشته باشد، فقط خود جمله نمایش داده می‌شود.",
+                    modifier = Modifier.padding(start = 12.dp),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            if (config.showMeaning) {
+                SectionLabel(R.string.widget_config_meaning_font)
+                FontPicker(config.meaningFont) { font -> viewModel.update { it.copy(meaningFont = font) } }
+
+                SectionLabel(R.string.widget_config_meaning_font_size)
+                PresetDropdown(fontSizePresets, config.meaningFontSizeSp) { size ->
+                    viewModel.update { it.copy(meaningFontSizeSp = size) }
+                }
+            }
+
             SectionLabel(R.string.widget_config_touch_action)
             TouchActionPicker(config.touchAction) { t -> viewModel.update { it.copy(touchAction = t) } }
 
@@ -212,6 +234,21 @@ private fun WidgetLivePreview(config: WidgetConfig, showWallpaper: Boolean) {
                     lineHeight = (config.fontSizeSp * config.lineSpacingMultiplier).sp
                 )
             )
+            if (config.showMeaning) {
+                Text(
+                    text = "و معنی جمله اینجا با فونت/اندازه جدا",
+                    style = TextStyle(
+                        color = Color(config.fontColorArgb).copy(alpha = config.opacityPercent / 100f),
+                        fontSize = config.meaningFontSizeSp.sp,
+                        fontFamily = fontFamilyFor(config.meaningFont),
+                        textAlign = when (config.textAlignment) {
+                            WidgetTextAlignment.RIGHT -> TextAlign.Right
+                            WidgetTextAlignment.CENTER -> TextAlign.Center
+                            WidgetTextAlignment.LEFT -> TextAlign.Left
+                        }
+                    )
+                )
+            }
             if (config.showDate && config.dateDisplay != WidgetDateDisplay.OFF) {
                 val today = LocalDate.now()
                 val text = if (config.dateDisplay == WidgetDateDisplay.SHORT_WITH_WEEKDAY) {

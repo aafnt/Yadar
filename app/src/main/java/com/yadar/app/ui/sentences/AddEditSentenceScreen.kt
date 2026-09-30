@@ -1,4 +1,4 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class, androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 
 package com.yadar.app.ui.sentences
 
@@ -96,6 +96,15 @@ fun AddEditSentenceScreen(viewModel: AddEditSentenceViewModel, onDone: () -> Uni
                 }
             },
             isError = state.text.length > SENTENCE_MAX_LENGTH
+        )
+
+        OutlinedTextField(
+            value = state.meaning,
+            onValueChange = viewModel::setMeaning,
+            label = { Text(stringResource(R.string.sentences_meaning_hint)) },
+            modifier = Modifier.fillMaxWidth(),
+            minLines = 2,
+            maxLines = 5
         )
 
         CollectionDropdown(
@@ -199,9 +208,13 @@ private fun RuleTypeDropdown(selected: DisplayRuleType, onSelect: (DisplayRuleTy
 
 @Composable
 private fun WeekdayChips(selected: Set<DayOfWeek>, onToggle: (DayOfWeek) -> Unit) {
-    Row(
+    // هر ۷ روز هفته در یک Row ساده جا نمی‌شوند و روی گوشی از صفحه بیرون می‌زنند
+    // (دقیقاً همین باعث می‌شد پنجشنبه و جمعه اصلاً قابل انتخاب نباشند). با FlowRow
+    // چیپ‌ها خودشان بسته به عرض صفحه به خط بعد می‌روند.
+    androidx.compose.foundation.layout.FlowRow(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         weekdayOrder.forEach { day ->
             FilterChip(

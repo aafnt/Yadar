@@ -16,7 +16,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40,14 +39,9 @@ fun CollectionsScreen(viewModel: CollectionsViewModel) {
     var editingCollection by remember { mutableStateOf<Collection?>(null) }
     var deletingCollection by remember { mutableStateOf<Collection?>(null) }
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(onClick = { showAddDialog = true }) {
-                Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.collections_add))
-            }
-        }
-    ) { padding ->
-        Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+    // بدون Scaffold تودرتو، طبق همان اصلاح SentencesScreen (فضای خالی روی Navigation Bar).
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize()) {
             if (collections.isEmpty()) {
                 Text(
                     text = stringResource(R.string.collections_empty_title),
@@ -69,6 +63,12 @@ fun CollectionsScreen(viewModel: CollectionsViewModel) {
                     }
                 }
             }
+        }
+        FloatingActionButton(
+            onClick = { showAddDialog = true },
+            modifier = Modifier.align(Alignment.BottomEnd).padding(20.dp)
+        ) {
+            Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.collections_add))
         }
     }
 
