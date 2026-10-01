@@ -174,7 +174,13 @@ private fun YadarApp(container: com.yadar.app.di.AppContainer, settingsVm: Setti
             composable(YadarRoute.SCHEDULE.route) {
                 val vm: ScheduleViewModel = viewModel(factory = viewModelFactory {
                     initializer {
-                        ScheduleViewModel(container.widgetConfigRepository, container.collectionRepository, container.clearWidgetHistoryUseCase)
+                        ScheduleViewModel(
+                            container.widgetConfigRepository,
+                            container.collectionRepository,
+                            container.sentenceRepository,
+                            container.selectionEngine,
+                            container.clearWidgetHistoryUseCase
+                        )
                     }
                 })
                 ScheduleScreen(viewModel = vm)

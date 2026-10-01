@@ -2,10 +2,14 @@ package com.yadar.app.widget
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
+import androidx.glance.ImageProvider
 import androidx.glance.LocalSize
+import androidx.glance.action.ActionParameters
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -14,21 +18,15 @@ import androidx.glance.appwidget.action.ActionCallback
 import androidx.glance.appwidget.action.actionRunCallback
 import androidx.glance.appwidget.provideContent
 import androidx.glance.background
-import androidx.glance.action.ActionParameters
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.height
 import androidx.glance.layout.padding
-import androidx.glance.text.FontFamily
-import androidx.glance.text.FontStyle
-import androidx.glance.text.FontWeight
-import androidx.glance.text.Text
-import androidx.glance.text.TextAlign
-import androidx.glance.text.TextStyle
+import androidx.glance.layout.width
 import androidx.glance.unit.ColorProvider
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.dp
+import com.yadar.app.R
 import com.yadar.app.YadarApplication
 import com.yadar.app.domain.model.FontChoice
 import com.yadar.app.domain.model.Sentence
@@ -77,7 +75,7 @@ class YadarWidget : GlanceAppWidget() {
 
         provideContent {
             GlanceTheme {
-                WidgetContent(config = config, sentence = sentence)
+                WidgetContent(context = context, config = config, sentence = sentence)
             }
         }
     }
@@ -102,12 +100,9 @@ class YadarWidget : GlanceAppWidget() {
 }
 
 @Composable
-private fun WidgetContent(config: WidgetConfig?, sentence: Sentence?) {
+private fun WidgetContent(context: Context, config: WidgetConfig?, sentence: Sentence?) {
     if (config == null) {
-        // Widget هنوز Configure نشده (نباید معمولاً رخ دهد چون Config اجباری است).
-        Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(text = "")
-        }
+        Box(modifier = GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {}
         return
     }
 
@@ -130,23 +125,21 @@ private fun WidgetContent(config: WidgetConfig?, sentence: Sentence?) {
         WidgetTouchAction.NONE -> GlanceModifier
     }
 
-    val alignment = when (config.textAlignment) {
+    val boxAlignment = when (config.textAlignment) {
         WidgetTextAlignment.RIGHT -> Alignment.CenterEnd
         WidgetTextAlignment.CENTER -> Alignment.Center
         WidgetTextAlignment.LEFT -> Alignment.CenterStart
     }
-    val textAlign = when (config.textAlignment) {
-        WidgetTextAlignment.RIGHT -> TextAlign.Right
-        WidgetTextAlignment.CENTER -> TextAlign.Center
-        WidgetTextAlignment.LEFT -> TextAlign.Left
-    }
+    val layoutAlignment = WidgetTextBitmapRenderer.layoutAlignmentFor(config.textAlignment)
 
-    // بند «بالا و پایین جمله خیلی خالی است»: وقتی کاربر Widget را بزرگ‌تر از یک
-    // خط کوچک می‌گذارد، فونت را متناسب با ارتفاع واقعی Widget کمی بزرگ‌تر
-    // می‌کنیم تا فضای خالی کمتر به چشم بیاید. این هرگز از اندازه انتخابی کاربر
-    // کوچک‌تر نمی‌شود، فقط در Widgetهای بزرگ‌تر آن را افزایش می‌دهد؛ برای
-    // جمله‌های طولانی‌تر کمتر بزرگ می‌شود تا از Widget بیرون نزند.
+    // بند «بالا و پایین جمله خیلی خالی است»: فونت را متناسب با ارتفاع واقعی
+    // Widget کمی بزرگ‌تر می‌کنیم (هیچ‌وقت از اندازه انتخابی کاربر کوچک‌تر نمی‌شود).
+    val density = context.resources.displayMetrics.density
     val availableHeightDp = LocalSize.current.height.value
+    val availableWidthDp = LocalSize.current.width.value
+    val horizontalPaddingDp = 24f // ۱۲dp از هر طرف
+    val maxWidthPx = (((availableWidthDp - horizontalPaddingDp) * density).toInt()).coerceAtLeast(1)
+
     val referenceHeightDp = 64f
     val textLength = sentence?.text?.length ?: 0
     val maxScaleForLength = when {
@@ -160,73 +153,105 @@ private fun WidgetContent(config: WidgetConfig?, sentence: Sentence?) {
     val meaningText = sentence?.meaning?.takeIf { it.isNotBlank() }
     val showMeaning = config.showMeaning && meaningText != null
 
+    val mainResult = sentence?.text?.let {
+        WidgetTextBitmapRenderer.render(
+            context = context,
+            text = it,
+            fontResId = fontResIdFor(config.font),
+            fontSizeSp = effectiveFontSizeSp,
+            colorArgb = config.fontColorArgb,
+            opacityPercent = config.opacityPercent,
+            isBold = config.fontWeight >= 700,
+            alignment = layoutAlignment,
+            maxLines = config.maxLines,
+            lineSpacingMultiplier = config.lineSpacingMultiplier,
+            maxWidthPx = maxWidthPx
+        )
+    }
+
+    val meaningResult = if (showMeaning) {
+        WidgetTextBitmapRenderer.render(
+            context = context,
+            text = meaningText.orEmpty(),
+            fontResId = fontResIdFor(config.meaningFont),
+            fontSizeSp = config.meaningFontSizeSp * heightScale,
+            colorArgb = config.fontColorArgb,
+            opacityPercent = (config.opacityPercent * 0.85f).toInt(),
+            isBold = false,
+            alignment = layoutAlignment,
+            maxLines = config.maxLines,
+            lineSpacingMultiplier = config.lineSpacingMultiplier,
+            maxWidthPx = maxWidthPx
+        )
+    } else null
+
+    val dateResult = if (config.showDate && config.dateDisplay != WidgetDateDisplay.OFF) {
+        val today = LocalDate.now()
+        val dateText = if (config.dateDisplay == WidgetDateDisplay.SHORT_WITH_WEEKDAY) {
+            PersianDate.formatShortWithWeekday(today)
+        } else {
+            PersianDate.formatShort(today)
+        }
+        WidgetTextBitmapRenderer.render(
+            context = context,
+            text = dateText,
+            fontResId = fontResIdFor(config.font),
+            fontSizeSp = config.fontSizeSp * 0.6f,
+            colorArgb = config.fontColorArgb,
+            opacityPercent = (config.opacityPercent * 0.7f).toInt(),
+            isBold = false,
+            alignment = layoutAlignment,
+            maxLines = 1,
+            lineSpacingMultiplier = 1f,
+            maxWidthPx = maxWidthPx
+        )
+    } else null
+
     Box(
         modifier = backgroundModifier.then(touchModifier).padding(horizontal = 12.dp, vertical = 6.dp),
-        contentAlignment = alignment
+        contentAlignment = boxAlignment
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = sentence?.text ?: "",
-                maxLines = config.maxLines,
-                style = TextStyle(
-                    color = ColorProvider(
-                        ComposeColor(config.fontColorArgb).copy(alpha = config.opacityPercent / 100f)
-                    ),
-                    fontSize = effectiveFontSizeSp.sp,
-                    fontWeight = if (config.fontWeight >= 700) FontWeight.Bold else FontWeight.Normal,
-                    fontStyle = FontStyle.Normal,
-                    fontFamily = fontFamilyForWidget(config.font),
-                    textAlign = textAlign
-                )
-            )
-            // معنی/ترجمه، فقط اگر روشن باشد و جمله فعلی معنی داشته باشد؛ وگرنه فقط خود جمله.
-            if (showMeaning) {
-                Text(
-                    text = meaningText.orEmpty(),
-                    maxLines = config.maxLines,
-                    style = TextStyle(
-                        color = ColorProvider(
-                            ComposeColor(config.fontColorArgb).copy(alpha = (config.opacityPercent * 0.85f) / 100f)
-                        ),
-                        fontSize = (config.meaningFontSizeSp * heightScale).sp,
-                        fontFamily = fontFamilyForWidget(config.meaningFont),
-                        textAlign = textAlign
-                    )
+            mainResult?.let { result ->
+                Image(
+                    provider = ImageProvider(result.bitmap),
+                    contentDescription = null,
+                    modifier = GlanceModifier
+                        .width((result.widthPx / density).dp)
+                        .height((result.heightPx / density).dp)
                 )
             }
-            if (config.showDate && config.dateDisplay != WidgetDateDisplay.OFF) {
-                val today = LocalDate.now()
-                val dateText = if (config.dateDisplay == WidgetDateDisplay.SHORT_WITH_WEEKDAY) {
-                    PersianDate.formatShortWithWeekday(today)
-                } else {
-                    PersianDate.formatShort(today)
-                }
-                Text(
-                    text = dateText,
-                    style = TextStyle(
-                        color = ColorProvider(
-                            ComposeColor(config.fontColorArgb).copy(alpha = (config.opacityPercent * 0.7f) / 100f)
-                        ),
-                        fontSize = (config.fontSizeSp * 0.6f).sp,
-                        fontFamily = fontFamilyForWidget(config.font),
-                        textAlign = textAlign
-                    )
+            meaningResult?.let { result ->
+                Image(
+                    provider = ImageProvider(result.bitmap),
+                    contentDescription = null,
+                    modifier = GlanceModifier
+                        .width((result.widthPx / density).dp)
+                        .height((result.heightPx / density).dp)
+                )
+            }
+            dateResult?.let { result ->
+                Image(
+                    provider = ImageProvider(result.bitmap),
+                    contentDescription = null,
+                    modifier = GlanceModifier
+                        .width((result.widthPx / density).dp)
+                        .height((result.heightPx / density).dp)
                 )
             }
         }
     }
 }
 
-private fun fontFamilyForWidget(choice: FontChoice): FontFamily = when (choice) {
-    // نام هر FontFamily باید دقیقاً با نام فایل XML داخل res/font مطابقت داشته باشد
-    // تا Glance بتواند فونت سفارشی را در زمان اجرا Resolve کند.
-    FontChoice.VAZIRMATN -> FontFamily("vazirmatn")
-    FontChoice.ESTEDAD -> FontFamily("estedad")
-    FontChoice.SAHEL -> FontFamily("sahel")
-    FontChoice.SHABNAM -> FontFamily("shabnam")
-    FontChoice.SAMIM -> FontFamily("samim")
-    FontChoice.LALEZAR -> FontFamily("lalezar")
-    FontChoice.PERSIAN_SOLS -> FontFamily("persian_sols")
+/** هر FontChoice به فایل XML خانواده فونت مربوط به خودش در res/font نگاشت می‌شود. */
+private fun fontResIdFor(choice: FontChoice): Int = when (choice) {
+    FontChoice.VAZIRMATN -> R.font.vazirmatn
+    FontChoice.ESTEDAD -> R.font.estedad
+    FontChoice.SAHEL -> R.font.sahel
+    FontChoice.SHABNAM -> R.font.shabnam
+    FontChoice.SAMIM -> R.font.samim
+    FontChoice.LALEZAR -> R.font.lalezar
+    FontChoice.PERSIAN_SOLS -> R.font.persian_sols
 }
 
 class NextSentenceActionCallback : ActionCallback {

@@ -156,9 +156,19 @@ APK در `app/build/outputs/apk/debug/` قرار می‌گیرد.
    با فرمت ۱۴۰۵/۰۷/۰۱ که با `PersianDate.parseJalaliString` اعتبارسنجی می‌شود»
    استفاده شد. این‌ها کاملاً کاربردی‌اند؛ اگر بعداً یک Picker گرافیکی‌تر
    خواستی، فقط این دو Composable نیاز به جایگزینی دارند.
-7. **فونت سفارشی در Glance**: `androidx.glance.text.FontFamily(name: String)`
-   با نام دقیق فایل XML فونت (بدون پسوند) فراخوانی شده تا Glance آن را در زمان
-   Render از `res/font` پیدا کند.
+7. **فونت سفارشی در Glance (اصلاح‌شده)**: نسخه اول این کد فرض کرده بود
+   `androidx.glance.text.FontFamily(name: String)` می‌تواند فونت سفارشی را از
+   `res/font` پیدا کند — این فرض **غلط از آب درآمد** و با مستندات رسمی
+   Android رد شد: Glance برای AppWidget فقط فونت‌های سیستمی
+   (sans-serif/serif/monospace/cursive) را پشتیبانی می‌کند؛ «فونت‌های سفارشی
+   پشتیبانی نمی‌شوند» (developer.android.com/develop/ui/compose/glance/build-ui).
+   یعنی تا قبل از این رفع باگ، هیچ‌کدام از ۷ فونت یادآر واقعاً روی خود Widget
+   اعمال نمی‌شد (فقط در پیش‌نمایش داخل برنامه که از Compose معمولی استفاده
+   می‌کند). راه‌حل واقعی: `WidgetTextBitmapRenderer` متن را با `StaticLayout`
+   و یک `Typeface` واقعی (بارگذاری‌شده با `ResourcesCompat.getFont`) روی یک
+   Bitmap شفاف رسم می‌کند و به‌جای `Text`، همان Bitmap را با
+   `Image`/`ImageProvider` نشان می‌دهد — تنها راه شناخته‌شده برای فونت واقعی
+   در AppWidget.
 
 ---
 

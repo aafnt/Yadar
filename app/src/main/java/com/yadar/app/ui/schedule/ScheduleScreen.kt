@@ -53,6 +53,25 @@ fun ScheduleScreen(viewModel: ScheduleViewModel) {
                     Text("مجموعه: ${item.collectionName}", style = MaterialTheme.typography.bodyMedium)
                     Text("فونت: ${item.config.font.name}", style = MaterialTheme.typography.bodyMedium)
                     Text("روش انتخاب: ${item.config.selectionMode.name}", style = MaterialTheme.typography.bodyMedium)
+                    val eligibleColor = if (item.eligibleNowCount <= 1) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    }
+                    Text(
+                        "جمله‌های واجد شرایط الان: ${PersianDigits.toPersian(item.eligibleNowCount)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = eligibleColor
+                    )
+                    if (item.eligibleNowCount <= 1) {
+                        Text(
+                            "اگر عدد بالا ۱ یا صفر است، لمس Widget اثر محسوسی نخواهد داشت — " +
+                                "یا مجموعه انتخابی این Widget را به «همه مجموعه‌ها» تغییر بده، یا " +
+                                "قوانین روز/ساعت جمله‌های دیگر را بررسی کن.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                     TextButton(onClick = {
                         val intent = Intent(context, WidgetConfigActivity::class.java)
                             .putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, item.config.widgetId)
